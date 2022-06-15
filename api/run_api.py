@@ -1,4 +1,5 @@
 import os
+from typing import Optional, Awaitable
 
 import tornado
 from tornado.ioloop import IOLoop
@@ -14,6 +15,9 @@ data_func = DataFunction()
 
 
 class BaseHandler(tornado.web.RequestHandler):
+    def data_received(self, chunk: bytes) -> Optional[Awaitable[None]]:
+        pass
+
     def get(self):
         self.render("html/index.html")
 
@@ -40,7 +44,7 @@ class DataHandler(BaseHandler):
         )
 
 
-class LogoutHadler(BaseHandler):
+class LogoutHandler(BaseHandler):
     def get(self):
         self.clear_cookie("user")
         self.redirect("/login")
@@ -72,7 +76,7 @@ def main():
     app = tornado.web.Application([
         (r"/", BaseHandler),
         (r"/login", LoginHandler),
-        (r"/logout", LogoutHadler),
+        (r"/logout", LogoutHandler),
         (r"/data", DataHandler),
     ], **settings)
 

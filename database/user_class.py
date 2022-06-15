@@ -22,8 +22,8 @@ class UserFunction:
     def set_last_request(self, login: str) -> bool:
         """
         Updating the information (last request) of an existing user
-        :param: login: user login
-        :return: bool
+        @param: login: user login
+        @return: bool
         """
 
         user = self.session.query(
@@ -41,9 +41,9 @@ class UserFunction:
     def add_user(self, login: str, password: str) -> bool:
         """
         Adding a new user to the table and updating the information of an existing user
-        :param: login: user login
-        :param: password: user password
-        :return: a boolean value that determine user has been added/updated or not
+        @param: login: user login
+        @param: password: user password
+        @return: a boolean value that determine user has been added/updated or not
         """
 
         check_user = self.session.query(
