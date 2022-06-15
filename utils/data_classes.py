@@ -42,4 +42,7 @@ class APIConfig:
 class TableRow:
     begin_ip: str
     end_ip: str
-    amount: int
+    amount: str
+
+    def get_values(self) -> list:
+        return [self.begin_ip, self.end_ip, self.amount]

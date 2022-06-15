@@ -1,5 +1,6 @@
 import argparse
-import re
+import json
+from typing import Optional
 
 from parsel import Selector
 from prettytable import PrettyTable
@@ -12,17 +13,18 @@ from selenium.webdriver.support.wait import WebDriverWait
 from database.data_class import DataFunction
 from database.models.db_collected_data import CollectedData
 from utils.context import ProjectContext
-from utils.util import strtobool
+from utils.data_classes import TableRow
+from utils.util import strtobool, delete_tag
 
 context = ProjectContext()
 data_func = DataFunction()
 
 
-def pars() -> zip:
+def pars() -> list['TableRow']:
     """
-    Parsing data from the website. Take all rows in data table
-    :param: None
-    :return all_rows: zip-iterator of rows
+    Parsing data from the website. Converting rows of data
+    to a zip-iterator
+    @return all_rows: list of dataclass
     """
 
     driver = webdriver.Chrome(context.chromedriver_path)
@@ -35,6 +37,8 @@ def pars() -> zip:
         print("[+] Loading took too much time")
 
     py_source = driver.find_element(By.XPATH, '//*[@id="ip-address"]').get_attribute('outerHTML')
+    driver.close()
+
     selector = Selector(text=py_source)
 
     received_begin_ip = selector.xpath('//tbody/tr[*]/td[1]').getall()
@@ -43,51 +47,47 @@ def pars() -> zip:
 
     print("[+] Data was received from the website")
 
-    return zip(received_begin_ip, received_end_ip, received_amount)
+    table_rows: Optional[list['TableRow']] = []
+    for begin_ip, end_ip, amount in zip(received_begin_ip, received_end_ip, received_amount):
+        table_rows.append(TableRow(begin_ip, end_ip, amount))
+
+    return table_rows
 
 
-def output_console(all_rows: zip) -> None:
+def output_console(all_rows: list['TableRow']) -> None:
     """
     Output of the parsed data to the console in the form
     of a table
-    :param all_rows: zip-iterator of all rows
-    :return: None
+    @param all_rows: list of dataclass
     """
 
     table = PrettyTable()
     table.field_names = ["Begin IP", "End IP", "Amount"]
 
-    not_empty_tag = r'^<td(.*)>(.+)<\/td>$'
-
-    for begin_ip, end_ip, amount in all_rows:
-        table.add_row([
-            re.match(not_empty_tag, begin_ip).group(2),
-            re.match(not_empty_tag, end_ip).group(2),
-            re.match(not_empty_tag, amount).group(2)
-        ])
+    for row in all_rows:
+        clear_row = delete_tag(row)
+        table.add_row(clear_row.get_values())
 
     print(table)
     print("[+] Data was output to the console")
 
 
-def fill_table(all_rows: zip) -> None:
+def fill_table(all_rows: list['TableRow']) -> None:
     """
-    Clears the data table and adding the parsed
-    data to a table in the database
-    :param all_rows: zip-iterator of all rows
-    :return: None
+    Clearing and adding data parsed from the website
+    to the DB table
+    @param all_rows: list of dataclass
     """
-
-    not_empty_tag = r'^<td(.*)>(.+)<\/td>$'
 
     list_of_collected_data = []
 
-    for begin_ip, end_ip, amount in all_rows:
+    for row in all_rows:
+        clear_row = delete_tag(row)
         list_of_collected_data.append(
             CollectedData(
-                begin_ip_address=re.match(not_empty_tag, begin_ip).group(2),
-                end_ip_address=re.match(not_empty_tag, end_ip).group(2),
-                amount=int(re.match(not_empty_tag, amount).group(2))
+                begin_ip_address=clear_row.begin_ip,
+                end_ip_address=clear_row.end_ip,
+                amount=int(clear_row.amount)
             )
         )
 
@@ -95,11 +95,34 @@ def fill_table(all_rows: zip) -> None:
     print("[+] Data has been added to the DB table")
 
 
-def check_arg() -> argparse.Namespace:
+def data_to_json(all_rows: list['TableRow']):
+    """
+    Converting data from the website to json
+    @return: json object with data
+    """
+
+    temp_list = []
+    result_dict = {}
+
+    for index, row in enumerate(all_rows):
+        clear_row = delete_tag(row)
+        temp_list.append({
+            'id': index,
+            'begin_ip': clear_row.begin_ip,
+            'end_ip': clear_row.end_ip,
+            'amount': clear_row.amount
+        })
+
+    result_dict['data'] = temp_list
+    result_dict['total'] = len(temp_list)
+
+    return json.dumps(result_dict, indent=4)
+
+
+def check_arg() -> 'argparse.Namespace':
     """
     Taking parameters(arguments) from the console or configuration
-    :param: None
-    :return arguments:
+    @return arguments: arguments from the console
     """
 
     argument = argparse.ArgumentParser()
@@ -109,17 +132,28 @@ def check_arg() -> argparse.Namespace:
     return arguments
 
 
-if __name__ == '__main__':
-
+def main():
     args = check_arg()
 
     if args is not None:
-        result_of_pars = pars()
         print(f'[+] Parameter from the console: dry_run - {args.dry_run}')
+        result_of_pars = pars()
 
-        if args.dry_run:
-            output_console(result_of_pars)
-        else:
-            fill_table(result_of_pars)
+        match args.dry_run:
+            case True:
+                output_console(result_of_pars)
+            case False:
+                fill_table(result_of_pars)
+            case 'json':
+                result = data_to_json(result_of_pars)
+                with open("file.json", 'w') as f:
+                    f.write(result)
+            case other:
+                print(f'Unresolved value: {other}')
+
     else:
         args = input("Yes - output in console, No - fill the table")
+
+
+if __name__ == '__main__':
+    main()
