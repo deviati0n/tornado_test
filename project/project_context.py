@@ -9,7 +9,8 @@ class ProjectContext:
 
     def __init__(self):
         self.project_path = path.dirname(path.realpath(__file__))
-        config_path = path.join(self.project_path, 'config.yaml')
+        config_path = path.join(self.project_path, '../utils/config.yaml')
+        self.logs_path = path.join(self.project_path, 'logs')
         self.chromedriver_path = r'E:\Chromedriver.exe'
 
         with open(config_path, 'r') as f:

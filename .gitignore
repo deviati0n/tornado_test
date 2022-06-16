@@ -7,3 +7,4 @@ venv/*
 
 *.yaml
 main.py
+/project/logs/
