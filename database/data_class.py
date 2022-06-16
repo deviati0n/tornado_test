@@ -5,7 +5,10 @@ from sqlalchemy import select
 from sqlalchemy.orm import sessionmaker
 
 from database.models.db_collected_data import CollectedData
-from utils.context import ProjectContext
+from project.log_lib import get_logger
+from project.project_context import ProjectContext
+
+logger = get_logger('tornado_test')
 
 
 class DataFunction:
@@ -31,6 +34,7 @@ class DataFunction:
         )
 
         self.commit()
+        logger.info('The "Collected data" table has been cleared')
 
     def add_new_data(self, collected_data: list) -> None:
         """
@@ -40,6 +44,7 @@ class DataFunction:
         self.clear_collected_data_table()
         self.session.bulk_save_objects(collected_data)
         self.commit()
+        logger.info('The "Collected data" table has been updated')
 
     def take_distinct_amount(self):
         """

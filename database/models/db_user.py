@@ -3,7 +3,7 @@ from datetime import datetime
 import sqlalchemy as sa
 from sqlalchemy.orm import declarative_base
 
-from utils.context import ProjectContext
+from project.project_context import ProjectContext
 from utils.util import strtobool
 
 context = ProjectContext()

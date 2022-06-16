@@ -12,15 +12,17 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 from database.data_class import DataFunction
 from database.models.db_collected_data import CollectedData
-from utils.context import ProjectContext
+from project.log_lib import get_logger
+from project.project_context import ProjectContext
 from utils.data_classes import TableRow
 from utils.util import strtobool, delete_tag
 
 context = ProjectContext()
 data_func = DataFunction()
+logger = get_logger('tornado_test')
 
 
-def pars() -> list['TableRow']:
+def parsing() -> list['TableRow']:
     """
     Parsing data from the website. Converting rows of data
     to a zip-iterator
@@ -32,9 +34,9 @@ def pars() -> list['TableRow']:
 
     try:
         WebDriverWait(driver, 3).until(ec.presence_of_element_located((By.CLASS_NAME, 'sorting_1')))
-        print("[+] Page has loaded")
+        logger.info(f'Page has been loaded')
     except TimeoutException:
-        print("[+] Loading took too much time")
+        logger.error('Loading took too much time')
 
     py_source = driver.find_element(By.XPATH, '//*[@id="ip-address"]').get_attribute('outerHTML')
     driver.close()
@@ -45,7 +47,7 @@ def pars() -> list['TableRow']:
     received_end_ip = selector.xpath('//tbody/tr[*]/td[2]').getall()
     received_amount = selector.xpath('//tbody/tr[*]/td[3]').getall()
 
-    print("[+] Data was received from the website")
+    # print("[+] Data was received from the website")
 
     table_rows: Optional[list['TableRow']] = []
     for begin_ip, end_ip, amount in zip(received_begin_ip, received_end_ip, received_amount):
@@ -69,7 +71,7 @@ def output_console(all_rows: list['TableRow']) -> None:
         table.add_row(clear_row.get_values())
 
     print(table)
-    print("[+] Data was output to the console")
+    logger.info('Data was output to the console')
 
 
 def fill_table(all_rows: list['TableRow']) -> None:
@@ -92,7 +94,7 @@ def fill_table(all_rows: list['TableRow']) -> None:
         )
 
     data_func.add_new_data(list_of_collected_data)
-    print("[+] Data has been added to the DB table")
+    logger.info('Data has been added to the DB table')
 
 
 def data_to_json(all_rows: list['TableRow']):
@@ -137,7 +139,7 @@ def main():
 
     if args is not None:
         print(f'[+] Parameter from the console: dry_run - {args.dry_run}')
-        result_of_pars = pars()
+        result_of_pars = parsing()
 
         match args.dry_run:
             case True:

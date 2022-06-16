@@ -4,8 +4,11 @@ import sqlalchemy as sa
 from sqlalchemy.orm import sessionmaker
 
 from database.models.db_user import User
-from utils.context import ProjectContext
+from project.log_lib import get_logger
+from project.project_context import ProjectContext
 from utils.util import encode_pass, check_pass
+
+logger = get_logger('tornado_test')
 
 
 class UserFunction:
@@ -62,6 +65,8 @@ class UserFunction:
 
         else:
             return False
+
+        logger.info('The "User" table has been updated')
 
         self.commit()
         return True
