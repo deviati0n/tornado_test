@@ -1,0 +1,13 @@
+parsing:
+  url: 'https://lite.ip2location.com/russian-federation-ip-address-ranges'
+
+database:
+  user: 'postgres'
+  password: 'password'
+  host: 'localhost'
+  port: 5432
+  name: 'database'
+
+api:
+  cookie: 'cookie_secret'
+  port: 8888
