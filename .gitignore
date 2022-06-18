@@ -5,6 +5,6 @@
 
 venv/*
 
-*.yaml
+config.yaml
 main.py
 /project/logs/
