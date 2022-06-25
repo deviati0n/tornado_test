@@ -25,7 +25,7 @@ logger = get_logger('tornado_test')
 def parsing() -> list['TableRow']:
     """
     Parsing data from the website. Converting rows of data
-    to a zip-iterator
+    to a list of dataclass
     @return all_rows: list of dataclass
     """
 
@@ -46,8 +46,6 @@ def parsing() -> list['TableRow']:
     received_begin_ip = selector.xpath('//tbody/tr[*]/td[1]').getall()
     received_end_ip = selector.xpath('//tbody/tr[*]/td[2]').getall()
     received_amount = selector.xpath('//tbody/tr[*]/td[3]').getall()
-
-    # print("[+] Data was received from the website")
 
     table_rows: Optional[list['TableRow']] = []
     for begin_ip, end_ip, amount in zip(received_begin_ip, received_end_ip, received_amount):

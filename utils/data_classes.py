@@ -12,16 +12,16 @@ class ParsingConfig:
 
 @dataclass
 class DatabaseConfig:
-    login: str
+    user: str
     password: str
-    server: str
+    host: str
     port: int
     name: str
 
     @property
     def db_connection(self) -> str:
-        return f'postgresql://{self.login}:{self.password}@' \
-               f'{self.server}:{self.port}/{self.name}'
+        return f'postgresql://{self.user}:{self.password}@' \
+               f'{self.host}:{self.port}/{self.name}'
 
 
 @dataclass
