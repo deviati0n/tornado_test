@@ -41,6 +41,27 @@ class UserFunction:
         user.last_request = datetime.utcnow()
         self.commit()
 
+    def check_user(self, login: str, password: str) -> bool:
+        """
+        Checking the existence of a user in the database
+        @param: login: user login
+        @param: password: user password
+        @return: a boolean value that determine user exists or not
+        """
+
+        check_user = self.session.query(
+            User
+        ).filter(
+            User.login == login
+        ).first()
+
+        if check_user is not None and check_pass(password, check_user.password):
+            check_user.last_request = datetime.utcnow()
+            self.commit()
+            return True
+
+        return False
+
     def add_user(self, login: str, password: str) -> bool:
         """
         Adding a new user to the table and updating the information of an existing user
@@ -56,18 +77,14 @@ class UserFunction:
         ).first()
 
         if check_user is None:
-
             user = User(login=login, password=encode_pass(password), last_request=datetime.utcnow())
             self.session.merge(user)
-
         elif check_pass(password, check_user.password):
             check_user.last_request = datetime.utcnow()
-
         else:
             return False
 
         logger.info('The "User" table has been updated')
-
         self.commit()
         return True
 

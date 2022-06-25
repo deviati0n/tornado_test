@@ -36,12 +36,21 @@
                         </select>
                     </div>
 
-                    <hr class="my-4">
-                    <button class="w-100 btn btn-outline-dark btn-sm" type="submit">Accept</button>
+                    <button class="w-100 my-3 btn btn-outline-dark btn-sm" type="submit">Accept</button>
                 </form>
 
-                <hr class="my-4">
+                <hr class="my-3">
                 <label for="amount" class="form-label">Total number of IP Address ranges: <b>{{ len(value) }}</b></label>
+                <hr class="my-3">
+
+                <form method='post' action='/data' onsubmit="return confirm('Do you really want to update the table?');">
+                    <button class="w-100 btn btn-outline-dark btn-sm" type="submit">Update table</button>
+                </form>
+
+                <form class='my-3' action='/api/data'>
+                    <button class="w-100 btn btn-outline-dark btn-sm" type="submit">JSON-format</button>
+                </form>
+
             </nav>
 
             <script>
