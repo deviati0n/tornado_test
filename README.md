@@ -1,6 +1,7 @@
 # Tornado Test Project
 
-![Heroku](https://pyheroku-badge.herokuapp.com/?app=tornado-test-task&style=plastic&link=https://tornado-test-task.herokuapp.com/)
+<a href="https://tornado-test-task.herokuapp.com/">
+  <img src="https://img.shields.io/badge/Heroku-430098?style=for-the-badge&logo=heroku&logoColor=white"></a>
 
 The project was written to gain experience in writing Tornado Applications,
 consolidate skills in working with databases and parsing.
@@ -10,7 +11,7 @@ Parsing ip addresses from a website and adding them to a database. The Tornado w
 processes six handlers that allow users to log in, output all data from a table in JSON format or a table.
 
 ## Requirements
-```requirements.txt
+``` 
 bcrypt~=3.2.2
 prettytable~=3.3.0
 PyYAML==6.0
