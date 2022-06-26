@@ -1,0 +1,10 @@
+bcrypt~=3.2.2
+prettytable~=3.3.0
+PyYAML==6.0
+selenium~=4.2.0
+SQLAlchemy~=1.4.36
+tornado==6.1
+parsel~=1.6.0
+psycopg2~=2.9.3
+coloredlogs~=15.0.1
+concurrent_log_handler~=0.9.20
