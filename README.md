@@ -1,6 +1,6 @@
 # Tornado Test Project
 
-<a href="https://tornado-test-task.herokuapp.com/">
+<a href="https://tornado-test-task.herokuapp.com/" target="_blank">
   <img src="https://img.shields.io/badge/Heroku-430098?style=for-the-badge&logo=heroku&logoColor=white"></a>
 
 The project was written to gain experience in writing Tornado Applications,
